@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri : mongodb+srv://bhojrajmca24:fuS94579dLQBXZ7b@cluster0.isdtu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database : journalDb
+      auto-index-creation: true
+
+server:
+  port: 8080
