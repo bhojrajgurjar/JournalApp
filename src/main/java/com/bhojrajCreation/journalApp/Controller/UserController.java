@@ -56,16 +56,16 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping()
-    public ResponseEntity<?> greeting(){
+    @GetMapping("/city/{city}")
+    public ResponseEntity<?> greeting(@PathVariable String city){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        WeatherResponse weatherResponse = weatherService.getWeather("Pune");
+        WeatherResponse weatherResponse = weatherService.getWeather(city);
         List<QuoteResponse> quoteResponse = quotesService.quoteForYou();
 
        String greet="";
         if(weatherResponse!=null){
-            greet=", Weather feels like " + weatherResponse.getCurrent().getFeelslike();
+            greet=", Weather at "+city+" feels like " + weatherResponse.getCurrent().getFeelslike();
         }
 
         return new ResponseEntity<>("Hi  "+auth.getName()+ greet +" and quote for you is ' "+quoteResponse.get(0).getQuote()+" '" , HttpStatus.OK);

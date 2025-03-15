@@ -1,2 +1,8 @@
-package com.bhojrajCreation.journalApp.Enum;public enum Sentiment {
+package com.bhojrajCreation.journalApp.Enum;
+
+public enum Sentiment {
+    HAPPY,
+    SAD,
+    ANGRY,
+    ANXIOUS
 }

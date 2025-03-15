@@ -1,6 +1,7 @@
-package com.bhojrajCreation.journalApp.Services;
+package com.bhojrajCreation.journalApp.Service;
 
 import com.bhojrajCreation.journalApp.Repository.UserRepository;
+import com.bhojrajCreation.journalApp.Services.UserDetailsServiceImp;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

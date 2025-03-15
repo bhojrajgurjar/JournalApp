@@ -1,7 +1,24 @@
 
 spring:
+  redis:
+    host: redis-19512.c239.us-east-1-2.ec2.redns.redis-cloud.com
+    port: 19512
+    password: aPPerLdKitck3dHMEZyNW4De4ZbVG18D
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: bgurjar2000@gmail.com
+    password: xzqy vwjx ibwn dyqk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
   profiles:
     active: dev
+
 
 logging:
   level:
@@ -13,3 +30,4 @@ logging:
 apiKey:
   weather: 73a478310b97aac7d49ce3d8b64f5782
   quote: A2Zqg0I+w4VkIZEWv3PgDw==cqYpwaZZN9jlH5Se
+
