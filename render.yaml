@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: springproject  # Change this to your preferred service name
+    env: java
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+    plan: free  # Or choose a paid plan for production
