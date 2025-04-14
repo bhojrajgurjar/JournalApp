@@ -1,0 +1,7 @@
+com\bhojrajCreation\journalApp\Service\RedisTest.class
+com\bhojrajCreation\journalApp\Repository\UserRepositoryImpTest.class
+com\bhojrajCreation\journalApp\Service\EmailServiceTest.class
+com\bhojrajCreation\journalApp\SchedullerTesting\UserSchedullerTest.class
+com\bhojrajCreation\journalApp\Service\UserServiceImpTest.class
+com\bhojrajCreation\journalApp\Service\UserServiceTest.class
+com\bhojrajCreation\journalApp\JournalAppApplicationTests.class

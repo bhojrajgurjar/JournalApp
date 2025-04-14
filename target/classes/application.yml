@@ -1,0 +1,54 @@
+
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  mvc:
+    static-path-pattern: /**
+  web:
+    resources:
+      static-locations: classpath:/static/
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${googleClientId}
+            client-secret: ${googleClientSecret}
+  redis:
+    host: redis-19512.c239.us-east-1-2.ec2.redns.redis-cloud.com
+    port: 19512
+    password: ${redisPassword}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: bgurjar2000@gmail.com
+    password: ${mailPassword}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  profiles:
+    active: dev
+
+
+logging:
+  level:
+    com:
+      bhojrajCreation:
+        journalApp: DEBUG
+
+
+apiKey:
+  weather: ${weatherApi}
+  quote: ${quoteApi}
+
+
+springdoc:
+  swagger-ui:
+    path: /docs
+

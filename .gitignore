@@ -1,16 +1,5 @@
 HELP.md
-# Ignore the target directory
-target/
 
-# Allow the maven-wrapper.jar to be tracked
-!.mvn/wrapper/maven-wrapper.jar
-
-# Allow JAR files in the target directory to be tracked
-!target/*.jar
-
-# Allow target directories in src/main and src/test to be tracked
-!**/src/main/**/target/
-!**/src/test/**/target/
 ### STS ###
 .apt_generated .classpath .factorypath .project .settings .springBeans .sts4-cache  *.yml *.log
 

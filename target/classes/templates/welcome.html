@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Welcome to Journal App</title>
+  <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #4a6bdf;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #3a56c4;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+  <h1>Welcome to Journal App</h1>
+  <div>
+    <a th:href="@{/user/login}" class="btn">Login</a>
+    <a th:href="@{/user/signup}" class="btn">Sign Up</a>
+  </div>
+</div>
+</body>
+</html>
