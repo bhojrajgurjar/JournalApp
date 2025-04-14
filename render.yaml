@@ -1,7 +1,6 @@
 services:
   - type: web
     name: springproject
-    runtime: java
     buildCommand: ./mvnw clean package
     startCommand: java -jar target/*.jar
     envVars:
