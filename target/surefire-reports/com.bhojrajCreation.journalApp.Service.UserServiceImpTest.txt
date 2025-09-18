@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.bhojrajCreation.journalApp.Service.UserServiceImpTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 0.001 s -- in com.bhojrajCreation.journalApp.Service.UserServiceImpTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 0.002 s -- in com.bhojrajCreation.journalApp.Service.UserServiceImpTest
