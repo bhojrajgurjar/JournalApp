@@ -17,5 +17,6 @@ public class SignupFormDTO {
     @Email(message = "Invalid email format")
     private String email;
     @Size(min = 6, message = "Password must be at least 6 characters")
+    @NotBlank(message = "Password cannot be empty")
     private String password;
 }
