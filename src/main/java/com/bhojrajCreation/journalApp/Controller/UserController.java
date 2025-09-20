@@ -31,9 +31,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -78,32 +81,44 @@ public class UserController {
 
     @PostMapping("/signup")
     public String processSignup(@Valid @ModelAttribute("user") UserDto userDto,
-                                BindingResult result, Model model) {
+                                BindingResult result,
+                                RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            return "signup"; // Return signup page if validation fails
+            if(userDto.getPassword().length()<6){
+                redirectAttributes.addFlashAttribute("error", "Password must of 6 character atleast");
+                return "redirect:/user/signup";
+            }
+            redirectAttributes.addFlashAttribute("error", "Sign Up Failed");
+            return "redirect:/user/signup";
         }
 
-        // Check if the username or email already exists
         if (userService.findByUsername(userDto.getUsername()) != null) {
-            model.addAttribute("error", "Username already exists");
-            return "signup";
+            redirectAttributes.addFlashAttribute("error", "Username already exists");
+            return "redirect:/user/signup";
         }
 
         if (userService.findByEmail(userDto.getEmail()) != null) {
-            model.addAttribute("error", "Email already exists");
-            return "signup";
+            redirectAttributes.addFlashAttribute("error", "Email already exists");
+            return "redirect:/user/signup";
         }
 
-        // Create a new user and save it
-        User newUser = new User();
-        newUser.setUsername(userDto.getUsername());
-        newUser.setEmail(userDto.getEmail());
-        newUser.setPassword(userDto.getPassword()); // Encrypt password
-        newUser.setRoles(Arrays.asList("USER")); // Assign default user role
 
-        userService.saveNewUser(newUser);
+        try {
+            User newUser = new User();
+            newUser.setUsername(userDto.getUsername());
+            newUser.setEmail(userDto.getEmail());
+            newUser.setPassword(userDto.getPassword()); // TODO: encrypt password
+            newUser.setRoles(Arrays.asList("USER"));
 
-        return "redirect:/user/login"; // Redirect to user home page after signup
+            userService.saveNewUser(newUser);
+
+            redirectAttributes.addFlashAttribute("success", "Account created successfully! Please login.");
+            return "redirect:/user/login";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Signup failed. Try again.");
+            return "redirect:/user/signup";
+        }
     }
 
     @GetMapping("/login")
@@ -113,7 +128,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String  loginUser(@ModelAttribute User user, Model model, HttpServletResponse response) {
+    public String  loginUser(@ModelAttribute User user, RedirectAttributes redirectAttributes, HttpServletResponse response) {
         try {
             // 1. Authenticate the user
             Authentication auth = authenticationManager.authenticate(
@@ -147,8 +162,9 @@ public class UserController {
             }
 
         } catch (AuthenticationException e) {
-            model.addAttribute("error", "Invalid username or password");
+            redirectAttributes.addFlashAttribute("error", "Invalid username or password");
             log.error("Login failed", e);
+            return "redirect:/user/login";
         }
 
         return "login";
@@ -160,7 +176,7 @@ public class UserController {
 
 
     @GetMapping("/home")
-    public String showUserHome(Model model) {
+    public String showUserHome(Model model, HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
@@ -184,7 +200,7 @@ public class UserController {
             JournalEntry latestEntry = entries.get(entries.size() - 1);
             model.addAttribute("latestEntry", latestEntry);
         }
-
+        model.addAttribute("request", request);
         return "user-home";
     }
 
@@ -203,30 +219,111 @@ public class UserController {
     }
 
     @GetMapping("/view-journal")
-    public String viewAllEntries(Model model) {
+    public String viewAllEntries(Model model,HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User user = userService.findByUsername(username);
         List<JournalEntry> entries = user.getJournalEntries();
         model.addAttribute("entries", entries);
+        model.addAttribute("request", request);
         return "view-journal";
     }
 
+
+//    @DeleteMapping("/journal/delete/{id}")
+//    @Operation(summary = "Delete Journal entry of user by Id")
+//    public ResponseEntity<Void> deleteJournalEntry(@PathVariable("id") ObjectId id) {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        String username = auth.getName();
+//
+//        boolean removed = journalEntryService.deleteById(id, username);
+//
+//        if (removed) {
+//            return ResponseEntity.noContent().build(); // ✅ returns 204
+//        } else {
+//            return ResponseEntity.notFound().build();  // ✅ returns 404
+//        }
+//    }
+
+
+
+
     @PostMapping("/journal/delete")
     @Operation(summary = "Delete Journal entry of user by Id")
-    public String deleteJournalEntry(@RequestParam("id") String id){
-
+    public String deleteJournalEntry(@RequestParam("id") String id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        boolean removed = journalEntryService.deleteById(new ObjectId(id),username);
+
+        boolean removed = journalEntryService.deleteById(new ObjectId(id), username);
+
+        // Fallback to the default redirect if no redirectTo is provided
         if (removed) {
-            return "redirect:/user/view-journal"; // or your view page path
+            return "redirect:/user/view-journal";
         } else {
             return "redirect:/user/view-journal?error=notfound";
+        }
+    }
+
+    @PostMapping("/home/journal/delete")
+    @Operation(summary = "Delete Journal entry of user by Id")
+    public String deleteJournalEntryFromHome(@RequestParam("id") String id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        boolean removed = journalEntryService.deleteById(new ObjectId(id), username);
+
+        // Fallback to the default redirect if no redirectTo is provided
+        if (removed) {
+            return "redirect:/user/home";
+        } else {
+            return "redirect:/user/home?error=notfound";
+        }
+    }
+
+
+
+
+
+    @GetMapping("/edit-journal/{id}")
+    public String editJournal(@PathVariable ObjectId id, Model model) {
+        Optional<JournalEntry> entryOptional = journalEntryService.findById(id); // load from DB
+        if (entryOptional.isPresent()) {
+            JournalEntry entry = entryOptional.get();
+            model.addAttribute("entry", entry);
+            return "edit-journal";
+        } else {
+            // Handle the case where the journal entry is not found.
+            // You can return a custom error page or redirect.
+            // For example, redirect to the home page or a not-found page.
+            return "redirect:/user/home"; // Or "redirect:/404"
+        }
+    }
+    @PutMapping("/update/id/{myId}")
+    @Operation(summary = "Update Journal entry of user by Id")
+    public ResponseEntity<JournalEntry> updateJournalEntry(@PathVariable ObjectId myId, @RequestBody JournalEntry newEntry){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        User user = userService.findByUsername(username);
+
+        List<JournalEntry> collect = user.getJournalEntries().stream().filter(x -> x.getId().equals(myId)).collect(Collectors.toList());
+
+        if (!collect.isEmpty()) {
+            Optional<JournalEntry> journalEntry = journalEntryService.findById(myId);
+            if (journalEntry.isPresent()) {
+                JournalEntry old = journalEntry.get();
+                if(old!=null){
+                    old.setTittle(newEntry.getTittle() != null && newEntry.getTittle() != "" ? newEntry.getTittle() : old.getTittle());
+                    old.setContent(newEntry.getContent() != null && newEntry.getContent() != "" ? newEntry.getContent() : old.getContent());
+                    journalEntryService.saveEntry(old);
+                    return new ResponseEntity<>(old,HttpStatus.OK);
+                }
+            }
         }
 
 
 
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
     }
 
