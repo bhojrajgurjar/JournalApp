@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -70,10 +71,11 @@
     <h1>Login to Your Account</h1>
 
     <!-- Check for login errors -->
-    <div th:if="${param.error}" class="error">Invalid username or password</div>
-    <div th:if="${param.logout}" class="success">You have been logged out</div>
+    <div th:if="${error}" style="color: red; margin-bottom: 8px; font-weight: bold;">
+        <span th:text="${error}"></span>
+    </div>
 
-    <form th:action="@{/user/login}" method="post">
+    <form id="loginForm" th:action="@{/user/login}" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <div class="form-group">
             <label for="username">Username</label>
@@ -87,64 +89,24 @@
     </form>
 
     <p class="text-center" style="margin-top: 1rem;">
-        Don't have an account? <a th:href="@{/user/signup}">Sign up here</a>
+        Don't have an account? <a th:href="@{/user/signup}">SignUp here</a>
     </p>
 </div>
 
+<div id="toast" th:if="${success}"
+     style="position: fixed; top: 7%; left: 50%; transform: translate(-50%, -50%);
+            background: #28a745; color: white; padding: 15px 25px;
+            border-radius: 8px; box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+            font-size: 1.1rem; text-align: center; z-index: 9999;">
+    <span th:text="${success}"></span>
+</div>
 
 <script>
-
-document.getElementById("loginForm").addEventListener("submit", async function(event) {
-    event.preventDefault();
-
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
-    const response = await fetch("/user/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ username, password })
-    });
-
-    if (response.ok) {
-        const jwt = await response.text(); // or response.json() if you're returning an object
-        localStorage.setItem("jwt", jwt); // store the token
-
-        // ✅ redirect to home page or load secure content
-        window.location.href = "/user/home";
-    } else {
-        document.getElementById("error").innerText = "Invalid username or password";
-    }
-});
-
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const csrfToken = document.querySelector('input[name="_csrf"]').value; // Get CSRF Token
-
-    fetch(this.action, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': csrfToken,  // ✅ Add CSRF token in request header
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams(new FormData(this)) // Convert form data to URL-encoded format
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = '/user/home';
-        } else {
-            errorElement.textContent = data.message || 'Invalid credentials';
-            errorElement.style.display = 'block';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+        let toast = document.getElementById("toast");
+        if (toast) toast.style.display = "none";
+    }, 3000);
 
 </script>
 </body>
