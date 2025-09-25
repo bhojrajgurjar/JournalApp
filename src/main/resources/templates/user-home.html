@@ -82,10 +82,10 @@
 
         <!-- Edit Button -->
         <td class="px-4 py-2 border-b text-center">
-          <button th:onclick="openEditModal([[${latestEntry.id.toHexString()}]], [[${latestEntry.tittle}]], [[${latestEntry.content}]])"
-                  class="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded text-sm">
-            Edit
-          </button>
+          <button th:onclick="|openEditModal('[[${latestEntry.id.toHexString()}]]', '[[${latestEntry.tittle}]]', '[[${latestEntry.content}]]')|"
+        class="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded text-sm">
+  Edit
+</button>
         </td>
 
         <!-- Delete Button -->
